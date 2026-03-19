@@ -12,9 +12,13 @@ INC: Guarda o vai-um. Soma 1 ao resultado final.
 F0 e F1: Em conjunto definem a operação a ser realizada.
 
 Conjunto de operações:
-    F0 = F1 = 0      -> indica que a saída é igual a A && B (A and B)
-    F0 = 0 e F1 = 1  -> indica que a saída é igual a A + B 
+    F0 = 0 e F1 = 0  -> indica que a saída é igual a A && B (A and B)
+    F0 = 0 e F1 = 1  -> indica que a saída é igual a A | B  (A or B)
     F0 = 1 e F1 = 0  -> indica que a saída é igual ao complemento de B
+    F0 = 1 e F1 = 1  -> indica que a saída é igual a soma aritmética
+
+Detalhe: 
+    -co é carry on na saída (valor de vai um) para os mafiosos
 
 Planejamento da execução do programa
     1- Armazenamento das variáveis iniciais A e B
@@ -25,6 +29,22 @@ Planejamento da execução do programa
     6- Próxima linha
 
 */
+
+// Protótipos das funções
+// (todas retornam uma string saída e ela é retornada por operações no final)
+
+// função geral para chamar as funções específicas
+// recebe F1, F2, A e B para poder repassar esses parâmetros caso necessário
+// retorna saída
+char* operacoes(int F1, int F2, char* A, char* B, char* co);
+
+char* and(char* A, char* B);
+
+char* or(char* A, char* B);
+
+char* compleB(char* B);
+ 
+char* somaArit(char* A, char* B, char* co);
 
 
 int main(){
