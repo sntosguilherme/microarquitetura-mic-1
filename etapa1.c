@@ -11,7 +11,10 @@ INVA: Inverte A bit a bit.
 INC: Guarda o vai-um. Soma 1 ao resultado final.
 F0 e F1: Em conjunto definem a operação a ser realizada.
 
-F0 = F1 = 0
+Conjunto de operações:
+    F0 = F1 = 0      -> indica que a saída é igual a A && B (A and B)
+    F0 = 0 e F1 = 1  -> indica que a saída é igual a A + B 
+    F0 = 1 e F1 = 0  -> indica que a saída é igual ao complemento de B
 
 Planejamento da execução do programa
     1- Armazenamento das variáveis iniciais A e B
