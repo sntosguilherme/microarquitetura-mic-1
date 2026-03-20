@@ -1,7 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
- 
 /* OQ FAZ CADA COMPONENTE
 A: OPERANDO 1
 B: OPERANDO 2
@@ -27,24 +23,25 @@ Planejamento da execução do programa
     4- Processamento das instruções 
     5- Escrita dos valores de IR, PC, A, B, S e o Vai-um no log
     6- Próxima linha
-
 */
 
 // Protótipos das funções
-// (todas retornam uma string saída e ela é retornada por operações no final)
 
-// função geral para chamar as funções específicas
+// aplica ENA, ENB, INVA em A e B.
+// por meio de f0 e f1 determina qual operacao sera realizada em A e B.
 // recebe F1, F2, A e B para poder repassar esses parâmetros caso necessário
 // retorna saída
-char* operacoes(int F1, int F2, char* A, char* B, char* co);
 
-char* and(char* A, char* B);
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-char* or(char* A, char* B);
-
-char* compleB(char* B);
- 
-char* somaArit(char* A, char* B, char* co);
+void processamentoEntradas(char * ir, char*a, char*b, unsigned int * aNum, unsigned int * bNum);
+unsigned int calculoULA(int f0, int f1, char* A, char* B, char* co);
+char* and(unsigned int A, unsigned int B);
+char* or(unsigned int A, unsigned int B);
+char* compleB(unsigned int B);
+char* somaArit(unsigned int, unsigned int, char* co);
 
 
 int main(){
@@ -55,7 +52,7 @@ int main(){
     // leitura do arquivo
     char arquivo[] = "programa_etapa1.txt";
     FILE *leitura;
-    leitura = fopen(arquivo, 'r');
+    leitura = fopen(arquivo, "r");
     
     if (leitura == NULL) printf("Erro ao abrir o arquivo.");     // checagem da abertura correta do arquivo
 
@@ -69,8 +66,55 @@ int main(){
     while (strcmp(IR, NULL)) {
         PC++;
         // a ideia aqui é fazer os passos 2, 3, 4 e 5
+        unsigned int aNum;
+        unsigned int bNum;
+        processamentoEntradas(IR, a, b, &aNum, &bNum);
     }
 
     fclose(leitura);
     return 0;
+}
+
+unsigned int calculoULA(int f0, int f1, char* A, char* B, char* co){
+    unsigned int s = 0; // Saída do programa
+
+    // direcionando para a operação correta a partir das entradas F0 e F1
+    if(f0 == 0 && f1 == 0){ // AND
+
+    }
+
+    if(f0 == 0 && f1 == 1){ // OR
+        
+    }
+
+    if(f0 == 1 && f1 == 0){ // B complemento
+        
+    }
+
+    if(f0 == 1 && f1 == 1){ // SUM
+        
+    }
+
+    return s;
+}
+
+void processamentoEntradas(char * ir, char*a, char*b, unsigned int * aNum, unsigned int * bNum){ 
+    // Separando as  instruções em variáveis e convertendo para inteiro.
+    int ena  = ir[2] - '0';
+    int enb  = ir[3] - '0';
+    int inva = ir[4] - '0';
+    int inc  = ir[5] - '0';
+
+    // convertendo A e B para unsigned int ( 32 bits ) para aplicar as operações.
+    // strtoul converte uma string para um unsigned long. 
+    // os parâmetros são a string, um ponteiro para onde a conversao parou (irrelevante no projeto) e a base numérica para qual será convertida. 2 = base binária.
+    *aNum = strtoul(a, NULL, 2);  
+    *bNum = strtoul(b, NULL, 2); 
+    
+    // aplicando os enables.
+    if(!ena) *aNum = 0;
+    if(!enb) *bNum = 0;
+    
+    //invertendo A bit a bit caso INVA == 1. o operador '~' cumpre essa função.
+    if(inva) *aNum = ~(*aNum);
 }
