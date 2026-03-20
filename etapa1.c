@@ -36,12 +36,10 @@ Planejamento da execução do programa
 #include <stdlib.h>
 #include <string.h>
 
-void processamentoEntradas(char * ir, char*a, char*b, unsigned int * aNum, unsigned int * bNum);
-unsigned int calculoULA(int f0, int f1, char* A, char* B, char* co);
-char* and(unsigned int A, unsigned int B);
-char* or(unsigned int A, unsigned int B);
-char* compleB(unsigned int B);
-char* somaArit(unsigned int, unsigned int, char* co);
+void processamentoEntradas(char * ir, char * a, char * b);
+char * calculoULA(int f0, int f1, char * a, char * b, char* co);
+char * somaArit(char * a, char * b, char * co);
+void printBits(unsigned int n);
 
 
 int main(){
@@ -58,25 +56,32 @@ int main(){
 
     int PC = 0;     // contador de programa
     char IR[7];     // registrador de instrução
+    unsigned int S; // saida
 
     // o contador vai identificar qual linha do arquivo está sendo lido, enquanto o registrador da respectiva linha
     // armazena a palavra de 6 bits contida nela
 
-    fgets(IR, sizeof(IR), arquivo);
-    while (strcmp(IR, NULL)) {
+    while (fgets(IR, sizeof(IR), arquivo)) {
         PC++;
         // a ideia aqui é fazer os passos 2, 3, 4 e 5
-        unsigned int aNum;
-        unsigned int bNum;
-        processamentoEntradas(IR, a, b, &aNum, &bNum);
+        unsigned int s;
+
+        char co = '0';
+        int f0 = IR[0] - '0';
+        int f1 = IR[01] - '0';
+        
+        processamentoEntradas(IR, &a, &b);
+        s = calculoULA(f0, f1, a, b, &co);
+
+        printBits(s);
     }
 
     fclose(leitura);
     return 0;
 }
 
-unsigned int calculoULA(int f0, int f1, char* A, char* B, char* co){
-    unsigned int s = 0; // Saída do programa
+char * calculoULA(int f0, int f1, char *a, char *b, char *co){
+    char *s; // Saída do programa
 
     // direcionando para a operação correta a partir das entradas F0 e F1
     if(f0 == 0 && f1 == 0){ // AND
@@ -84,11 +89,11 @@ unsigned int calculoULA(int f0, int f1, char* A, char* B, char* co){
     }
 
     if(f0 == 0 && f1 == 1){ // OR
-        
+
     }
 
     if(f0 == 1 && f1 == 0){ // B complemento
-        
+
     }
 
     if(f0 == 1 && f1 == 1){ // SUM
@@ -98,7 +103,7 @@ unsigned int calculoULA(int f0, int f1, char* A, char* B, char* co){
     return s;
 }
 
-void processamentoEntradas(char * ir, char*a, char*b, unsigned int * aNum, unsigned int * bNum){ 
+void processamentoEntradas(char * ir, char * a, char * b){ 
     // Separando as  instruções em variáveis e convertendo para inteiro.
     int ena  = ir[2] - '0';
     int enb  = ir[3] - '0';
@@ -108,13 +113,53 @@ void processamentoEntradas(char * ir, char*a, char*b, unsigned int * aNum, unsig
     // convertendo A e B para unsigned int ( 32 bits ) para aplicar as operações.
     // strtoul converte uma string para um unsigned long. 
     // os parâmetros são a string, um ponteiro para onde a conversao parou (irrelevante no projeto) e a base numérica para qual será convertida. 2 = base binária.
-    *aNum = strtoul(a, NULL, 2);  
-    *bNum = strtoul(b, NULL, 2); 
+    // *aNum = strtoul(a, NULL, 2);  
+    // *bNum = strtoul(b, NULL, 2); 
     
     // aplicando os enables.
-    if(!ena) *aNum = 0;
-    if(!enb) *bNum = 0;
+    if(!ena) *a = "00000000000000000000000000000000";
+    if(!enb) *b = "00000000000000000000000000000000";
     
-    //invertendo A bit a bit caso INVA == 1. o operador '~' cumpre essa função.
-    if(inva) *aNum = ~(*aNum);
+    //if(inva) *a = ~(*a); CHAMAR FUNÇÃO DE INVERTER NUMERO POR STRING
+}
+
+char * somaArit(char * a, char * b, char * co) {
+    int carry = 0, soma;
+    char s[33]; // string da saída
+
+    // processamento de cada caractere da direita para esquerda, guardando o carry
+    for (int i = 31; i >= 0; i--) {
+        if (a[i] != b[i]) soma = 1; // simula o a^b
+        else soma = 0;
+
+        if (carry) {
+            carry = soma && carry;
+            soma = soma^1;
+        }
+
+        else {
+            if (a[i] == '1' && b[i] == '1') carry = 1;
+            else carry = 0;
+        }
+
+        // insere o resultado na saída
+        s[i] = soma + '0';
+    }
+    s[32] = '\0';
+
+    *co = carry + '0';
+
+    return s;
+}
+
+// talvez n precise mas vou deixar aqui por enquanto
+void printBits(unsigned int n) {
+    for (int i = 31; i >= 0; i--) {
+        int k = n >> i; // move os bits pra direita
+        if (k & 1)
+            printf("1");
+        else
+            printf("0");
+    }
+    printf("\n");
 }
