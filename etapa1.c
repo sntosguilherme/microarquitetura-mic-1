@@ -36,14 +36,60 @@ Planejamento da execução do programa
 #include <stdlib.h>
 #include <string.h>
 
-void processamentoEntradas(char * ir, char * a, char * b);
-char * calculoULA(int f0, int f1, char * a, char * b, char* co);
-char * somaArit(char * a, char * b, char * co);
+void processamentoEntradas(char* ir, char* a, char* b);
+char* calculoULA(int f0, int f1, char* a, char* b, char* co);
+char* somaArit(char* a, char* b, char* co);
 void printBits(unsigned int n);
+
+void log(int pc, char* ir, char* a, char* b, char* s, char* co) {
+    if (!pc) {
+        printf("a = %s\n", a);
+        printf("b = %s\n\n", b);
+
+        printf("Começando!!!!\n");
+    }
+
+    printf("==============================================\n\n");
+    printf("Ciclo %d\n\n", pc);
+    printf("IR = %s\n", ir);
+    printf("b = %s\n", b);
+    printf("a = %s\n", a);
+    printf("s = %s\n", s);
+    printf("co = %d\n\n", co);
+    printf("==============================================\n");
+}
+
+
+void inversor(char *a) {
+    // inverte 1 para 0 e 0 para 1 enquanto não achar o fim da string
+    for(int i = 0; a[i] != '\0'; i++) {
+        if (a[i] == '0') {
+            a[i] = '1';
+        }
+        else {
+            a[i] = '0';
+        }
+    }
+}
+
+void and(char* a, char* b, char* s){
+    // lógica do operador AND
+    for (int i = 0; i < 32; i++) {
+        if (a[i] == '1' && b[i] == '1') {
+            s[i] = '1';
+        }
+        else {
+            s[i] = '0';
+        }
+    }
+
+    s[32] = '\0';
+
+    return s;
+}
 
 
 int main(){
-    // A e B iniciais
     char b[] = "00000000000000000000000000000001";
     char a[] = "11111111111111111111111111111111";
 
@@ -52,14 +98,12 @@ int main(){
     FILE *leitura;
     leitura = fopen(arquivo, "r");
     
-    if (leitura == NULL) printf("Erro ao abrir o arquivo.");     // checagem da abertura correta do arquivo
+    if (leitura == NULL) 
+        printf("Erro ao abrir o arquivo.");     // checagem da abertura correta do arquivo
 
     int PC = 0;     // contador de programa
     char IR[7];     // registrador de instrução
     unsigned int S; // saida
-
-    // o contador vai identificar qual linha do arquivo está sendo lido, enquanto o registrador da respectiva linha
-    // armazena a palavra de 6 bits contida nela
 
     while (fgets(IR, sizeof(IR), arquivo)) {
         PC++;
@@ -85,7 +129,7 @@ char * calculoULA(int f0, int f1, char *a, char *b, char *co){
 
     // direcionando para a operação correta a partir das entradas F0 e F1
     if(f0 == 0 && f1 == 0){ // AND
-
+        and(a, b, s);
     }
 
     if(f0 == 0 && f1 == 1){ // OR
@@ -93,7 +137,7 @@ char * calculoULA(int f0, int f1, char *a, char *b, char *co){
     }
 
     if(f0 == 1 && f1 == 0){ // B complemento
-
+        inversor(b);
     }
 
     if(f0 == 1 && f1 == 1){ // SUM
@@ -103,7 +147,7 @@ char * calculoULA(int f0, int f1, char *a, char *b, char *co){
     return s;
 }
 
-void processamentoEntradas(char * ir, char * a, char * b){ 
+void processamentoEntradas(char* ir, char* a, char* b){ 
     // Separando as  instruções em variáveis e convertendo para inteiro.
     int ena  = ir[2] - '0';
     int enb  = ir[3] - '0';
@@ -121,6 +165,7 @@ void processamentoEntradas(char * ir, char * a, char * b){
     if(!enb) *b = "00000000000000000000000000000000";
     
     //if(inva) *a = ~(*a); CHAMAR FUNÇÃO DE INVERTER NUMERO POR STRING
+    if (inva) inversor(a);
 }
 
 char * somaArit(char * a, char * b, char * co) {
