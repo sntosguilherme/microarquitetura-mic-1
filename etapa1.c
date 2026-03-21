@@ -62,8 +62,7 @@ int main(){
     // o contador vai identificar qual linha do arquivo está sendo lido, enquanto o registrador da respectiva linha
     // armazena a palavra de 6 bits contida nela
 
-    fgets(IR, sizeof(IR), arquivo);
-    while (strcmp(IR, NULL)) {
+    while (fgets(IR, sizeof(IR), leitura) != NULL) {
         PC++;
         // a ideia aqui é fazer os passos 2, 3, 4 e 5
         unsigned int aNum;
@@ -78,17 +77,19 @@ int main(){
 unsigned int calculoULA(int f0, int f1, char* A, char* B, char* co){
     unsigned int s = 0; // Saída do programa
 
+    *co = 0;
+
     // direcionando para a operação correta a partir das entradas F0 e F1
     if(f0 == 0 && f1 == 0){ // AND
-
+        s = A & B;
     }
 
     if(f0 == 0 && f1 == 1){ // OR
-        
+        s = A | B;
     }
 
     if(f0 == 1 && f1 == 0){ // B complemento
-        
+        s = ~B;
     }
 
     if(f0 == 1 && f1 == 1){ // SUM
@@ -100,6 +101,9 @@ unsigned int calculoULA(int f0, int f1, char* A, char* B, char* co){
 
 void processamentoEntradas(char * ir, char*a, char*b, unsigned int * aNum, unsigned int * bNum){ 
     // Separando as  instruções em variáveis e convertendo para inteiro.
+    int f0 = ir[0] - '0';
+    int f1 = ir[1] - '0';
+    
     int ena  = ir[2] - '0';
     int enb  = ir[3] - '0';
     int inva = ir[4] - '0';
@@ -117,4 +121,9 @@ void processamentoEntradas(char * ir, char*a, char*b, unsigned int * aNum, unsig
     
     //invertendo A bit a bit caso INVA == 1. o operador '~' cumpre essa função.
     if(inva) *aNum = ~(*aNum);
+
+    // aplicando o inc para ser mudado apenas no cáculo ULA
+    char co = 0;
+
+    unsigned int s = calculoULA(f0, f1, *aNum, *bNum, &co);
 }
