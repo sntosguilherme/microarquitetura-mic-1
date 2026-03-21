@@ -25,105 +25,61 @@ Planejamento da execução do programa
     6- Próxima linha
 */
 
-// Protótipos das funções
+#include "etapa1.h"
 
-// aplica ENA, ENB, INVA em A e B.
-// por meio de f0 e f1 determina qual operacao sera realizada em A e B.
-// recebe F1, F2, A e B para poder repassar esses parâmetros caso necessário
-// retorna saída
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-void processamentoEntradas(char * ir, char*a, char*b, unsigned int * aNum, unsigned int * bNum);
-unsigned int calculoULA(int f0, int f1, char* A, char* B, char* co);
-char* and(unsigned int A, unsigned int B);
-char* or(unsigned int A, unsigned int B);
-char* compleB(unsigned int B);
-char* somaArit(unsigned int, unsigned int, char* co);
-
+// Protótipos para visualizar melhor os tipos das funções
+void processamentoEntradas(char * ir, char * a, char * b);
+void and(char* a, char* b, char* s);
+char* calculoULA(int f0, int f1, char * a, char * b, char* co, char *s);
+void or(char * a, char * b, char *s);
+void somaArit(char * a, char * b, char * co, char *s);
+void incremento(char *s, char *co);
+void inversor(char *a);
+void logCiclo(int pc, char* ir, char* a, char* b, char* s, char co);
 
 int main(){
-    // A e B iniciais
-    char b[] = "00000000000000000000000000000001";
-    char a[] = "11111111111111111111111111111111";
+    // Declarações
+
+    // char b[33];  estão declaradas dentro do loop
+    // char a[33];
+    int PC = 0;     // contador de programa
+    char IR[8];     // registrador de instrução (tamanho 8 para 6bits, \0 e \n)
+    char s[33];     // saida
+    char co;        // carry on
+    int f0;
+    int f1;
 
     // leitura do arquivo
-    char arquivo[] = "programa_etapa1.txt";
+    char arquivo[] = "exemplos_projeto/programa_etapa1.txt";
     FILE *leitura;
     leitura = fopen(arquivo, "r");
     
-    if (leitura == NULL) printf("Erro ao abrir o arquivo.");     // checagem da abertura correta do arquivo
-
-    int PC = 0;     // contador de programa
-    char IR[7];     // registrador de instrução
+    if (leitura == NULL) {
+        printf("Erro ao abrir o arquivo."); // checagem da abertura correta do arquivo
+        return 1;
+    }
 
     // o contador vai identificar qual linha do arquivo está sendo lido, enquanto o registrador da respectiva linha
     // armazena a palavra de 6 bits contida nela
 
     while (fgets(IR, sizeof(IR), leitura) != NULL) {
+        char b[] = "00000000000000000000000000000001";
+        char a[] = "11111111111111111111111111111111";
         PC++;
         // a ideia aqui é fazer os passos 2, 3, 4 e 5
-        unsigned int aNum;
-        unsigned int bNum;
-        processamentoEntradas(IR, a, b, &aNum, &bNum);
+
+        co = '0';
+        f0 = IR[0] - '0';
+        f1 = IR[01] - '0';
+        
+        processamentoEntradas(IR, a, b);
+        calculoULA(f0, f1, a, b, &co, s);
+
+        if (IR[5] == '1') incremento(s, &co);
+
+        logCiclo(PC, IR, a, b, s, co);
     }
 
     fclose(leitura);
     return 0;
-}
-
-unsigned int calculoULA(int f0, int f1, char* A, char* B, char* co){
-    unsigned int s = 0; // Saída do programa
-
-    *co = 0;
-
-    // direcionando para a operação correta a partir das entradas F0 e F1
-    if(f0 == 0 && f1 == 0){ // AND
-        s = A & B;
-    }
-
-    if(f0 == 0 && f1 == 1){ // OR
-        s = A | B;
-    }
-
-    if(f0 == 1 && f1 == 0){ // B complemento
-        s = ~B;
-    }
-
-    if(f0 == 1 && f1 == 1){ // SUM
-        
-    }
-
-    return s;
-}
-
-void processamentoEntradas(char * ir, char*a, char*b, unsigned int * aNum, unsigned int * bNum){ 
-    // Separando as  instruções em variáveis e convertendo para inteiro.
-    int f0 = ir[0] - '0';
-    int f1 = ir[1] - '0';
-    
-    int ena  = ir[2] - '0';
-    int enb  = ir[3] - '0';
-    int inva = ir[4] - '0';
-    int inc  = ir[5] - '0';
-
-    // convertendo A e B para unsigned int ( 32 bits ) para aplicar as operações.
-    // strtoul converte uma string para um unsigned long. 
-    // os parâmetros são a string, um ponteiro para onde a conversao parou (irrelevante no projeto) e a base numérica para qual será convertida. 2 = base binária.
-    *aNum = strtoul(a, NULL, 2);  
-    *bNum = strtoul(b, NULL, 2); 
-    
-    // aplicando os enables.
-    if(!ena) *aNum = 0;
-    if(!enb) *bNum = 0;
-    
-    //invertendo A bit a bit caso INVA == 1. o operador '~' cumpre essa função.
-    if(inva) *aNum = ~(*aNum);
-
-    // aplicando o inc para ser mudado apenas no cáculo ULA
-    char co = 0;
-
-    unsigned int s = calculoULA(f0, f1, *aNum, *bNum, &co);
 }
