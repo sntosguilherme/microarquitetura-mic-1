@@ -9,7 +9,7 @@ void or(char * a, char * b, char *s);
 void somaArit(char * a, char * b, char * co, char *s);
 void incremento(char *s, char *co);
 void inversor(char *a);
-void logCiclo(int pc, char* ir, char* a, char* b, char* s, char co);
+void logCiclo(int pc, char* ir, char* a, char* b, char* s, char co, FILE* log);
 
 void processamentoEntradas(char* ir, char* a, char* b){ 
     // Separando as  instruções em variáveis e convertendo para inteiro.
@@ -118,22 +118,23 @@ void incremento(char *s, char *co) {
     somaArit(s, "00000000000000000000000000000001", co, s);
 }
 
-void logCiclo(int pc, char* ir, char* a, char* b, char* s, char co) {
+void logCiclo(int pc, char* ir, char* a, char* b, char* s, char co, FILE*log) {
     // printando o resultado do ciclo
-    if (pc == 1) {
-        printf("b = %s\n", b);
-        printf("a = %s\n\n", a);
 
-        printf("Começando!!!!\n");
-        printf("==============================================\n\n");
+    if (pc == 1) {
+        fprintf(log, "b = %s\n", b);
+        fprintf(log, "a = %s\n\n", a);
+
+        fprintf(log, "Comecando!!!!\n");
+        fprintf(log,"==============================================\n\n");
     }
 
-    printf("Ciclo %d\n\n", pc);
-    printf("PC = %d\n", pc);
-    printf("IR = %s\n", ir);
-    printf("b = %s\n", b);
-    printf("a = %s\n", a);
-    printf("s = %s\n", s);
-    printf("co = %c\n\n", co);
-    printf("==============================================\n");
+    fprintf(log,"Ciclo %d\n\n", pc);
+    fprintf(log,"PC = %d\n", pc);
+    fprintf(log,"IR = %s\n", ir);
+    fprintf(log,"b = %s\n", b);
+    fprintf(log,"a = %s\n", a);
+    fprintf(log,"s = %s\n", s);
+    fprintf(log,"co = %c\n\n", co);
+    fprintf(log,"==============================================\n");
 }

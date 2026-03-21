@@ -35,7 +35,7 @@ void or(char * a, char * b, char *s);
 void somaArit(char * a, char * b, char * co, char *s);
 void incremento(char *s, char *co);
 void inversor(char *a);
-void logCiclo(int pc, char* ir, char* a, char* b, char* s, char co);
+void logCiclo(int pc, char* ir, char* a, char* b, char* s, char co, FILE* log);
 
 int main(){
     // Declarações
@@ -50,12 +50,19 @@ int main(){
     int f1;
 
     // leitura do arquivo
-    char arquivo[] = "exemplos_projeto/programa_etapa1.txt";
+    char arquivo[] = "entrada-e-saida/programa_etapa1.txt";
     FILE *leitura;
     leitura = fopen(arquivo, "r");
     
     if (leitura == NULL) {
-        printf("Erro ao abrir o arquivo."); // checagem da abertura correta do arquivo
+        printf("Erro ao abrir o arquivo de instrucoes."); // checagem da abertura correta do arquivo
+        return 1;
+    }
+
+    // abertura do arquivo de saida do log
+    FILE * log = fopen("entrada-e-saida/saida.txt", "w");
+    if(!log) {
+        printf("Erro ao abrir o arquivo de log.\n");
         return 1;
     }
 
@@ -77,9 +84,10 @@ int main(){
 
         if (IR[5] == '1') incremento(s, &co);
 
-        logCiclo(PC, IR, a, b, s, co);
+        logCiclo(PC, IR, a, b, s, co, log);
     }
 
     fclose(leitura);
+    fclose(log);
     return 0;
 }
