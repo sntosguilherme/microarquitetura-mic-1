@@ -37,8 +37,9 @@ Planejamento da execução do programa
 #include <string.h>
 
 void processamentoEntradas(char * ir, char * a, char * b);
-char * calculoULA(int f0, int f1, char * a, char * b, char* co);
-char * somaArit(char * a, char * b, char * co);
+char * calculoULA(int f0, int f1, char * a, char * b, char* co, char *s);
+void or(char * a, char * b, char *s);
+void somaArit(char * a, char * b, char * co, char *s);
 void printBits(unsigned int n);
 
 
@@ -48,48 +49,48 @@ int main(){
     char a[] = "11111111111111111111111111111111";
 
     // leitura do arquivo
-    char arquivo[] = "programa_etapa1.txt";
+    char arquivo[] = "teste.txt";
     FILE *leitura;
     leitura = fopen(arquivo, "r");
     
     if (leitura == NULL) printf("Erro ao abrir o arquivo.");     // checagem da abertura correta do arquivo
 
     int PC = 0;     // contador de programa
-    char IR[7];     // registrador de instrução
-    unsigned int S; // saida
+    char IR[8];     // registrador de instrução (tamanho 8 para 6bits, \0 e \n)
+    char s[33];     // saida
+    char co;        // carry on
+    int f0;
+    int f1;
 
     // o contador vai identificar qual linha do arquivo está sendo lido, enquanto o registrador da respectiva linha
     // armazena a palavra de 6 bits contida nela
 
-    while (fgets(IR, sizeof(IR), arquivo)) {
+    while (fgets(IR, sizeof(IR), leitura) != NULL) {
         PC++;
         // a ideia aqui é fazer os passos 2, 3, 4 e 5
-        unsigned int s;
 
-        char co = '0';
-        int f0 = IR[0] - '0';
-        int f1 = IR[01] - '0';
+        co = '0';
+        f0 = IR[0] - '0';
+        f1 = IR[01] - '0';
         
-        processamentoEntradas(IR, &a, &b);
-        s = calculoULA(f0, f1, a, b, &co);
+        processamentoEntradas(IR, a, b);
+        calculoULA(f0, f1, a, b, &co, s);
 
-        printBits(s);
+        if (IR[5] == '1') incremento(s, co);
     }
 
     fclose(leitura);
     return 0;
 }
 
-char * calculoULA(int f0, int f1, char *a, char *b, char *co){
-    char *s; // Saída do programa
-
+char * calculoULA(int f0, int f1, char *a, char *b, char *co, char *s){
     // direcionando para a operação correta a partir das entradas F0 e F1
     if(f0 == 0 && f1 == 0){ // AND
 
     }
 
     if(f0 == 0 && f1 == 1){ // OR
-
+        or(a, b, s);
     }
 
     if(f0 == 1 && f1 == 0){ // B complemento
@@ -97,7 +98,7 @@ char * calculoULA(int f0, int f1, char *a, char *b, char *co){
     }
 
     if(f0 == 1 && f1 == 1){ // SUM
-        
+        somaArit(a, b, co, s);
     }
 
     return s;
@@ -117,15 +118,26 @@ void processamentoEntradas(char * ir, char * a, char * b){
     // *bNum = strtoul(b, NULL, 2); 
     
     // aplicando os enables.
-    if(!ena) *a = "00000000000000000000000000000000";
-    if(!enb) *b = "00000000000000000000000000000000";
+    if(!ena) a = "00000000000000000000000000000000";
+    if(!enb) b = "00000000000000000000000000000000";
     
     //if(inva) *a = ~(*a); CHAMAR FUNÇÃO DE INVERTER NUMERO POR STRING
 }
 
-char * somaArit(char * a, char * b, char * co) {
+void or(char *a, char *b, char *s) {
+    for (int i = 0; i < 32; i++) {
+        if (a[i] == '0' && b[i] == '0') {
+            s[i] = '0';
+        }
+
+        else s[i] = '1';
+    }
+
+    s[32] = '\0';
+}
+
+void somaArit(char *a, char *b, char *co, char *s) {
     int carry = 0, soma;
-    char s[33]; // string da saída
 
     // processamento de cada caractere da direita para esquerda, guardando o carry
     for (int i = 31; i >= 0; i--) {
@@ -148,8 +160,10 @@ char * somaArit(char * a, char * b, char * co) {
     s[32] = '\0';
 
     *co = carry + '0';
+}
 
-    return s;
+void incremento(char *s, char *co) {
+    somaArit(s, "00000000000000000000000000000001", co, s);
 }
 
 // talvez n precise mas vou deixar aqui por enquanto
