@@ -3,14 +3,13 @@
 #include <string.h>
 
 void processamentoEntradas(char * ir, char * a, char * b);
+void and(char* a, char* b, char* s);
 char* calculoULA(int f0, int f1, char * a, char * b, char* co, char *s);
 void or(char * a, char * b, char *s);
 void somaArit(char * a, char * b, char * co, char *s);
-void printBits(unsigned int n);
 void incremento(char *s, char *co);
-void logCiclo(int pc, char* ir, char* a, char* b, char* s, char co);
 void inversor(char *a);
-void and(char* a, char* b, char* s);
+void logCiclo(int pc, char* ir, char* a, char* b, char* s, char co);
 
 void processamentoEntradas(char* ir, char* a, char* b){ 
     // Separando as  instruções em variáveis e convertendo para inteiro.
@@ -18,18 +17,12 @@ void processamentoEntradas(char* ir, char* a, char* b){
     int enb  = ir[3] - '0';
     int inva = ir[4] - '0';
     int inc  = ir[5] - '0';
-
-    // convertendo A e B para unsigned int ( 32 bits ) para aplicar as operações.
-    // strtoul converte uma string para um unsigned long. 
-    // os parâmetros são a string, um ponteiro para onde a conversao parou (irrelevante no projeto) e a base numérica para qual será convertida. 2 = base binária.
-    // *aNum = strtoul(a, NULL, 2);  
-    // *bNum = strtoul(b, NULL, 2); 
     
     // aplicando os enables.
-    if(!ena) inversor(a);
-    if(!enb) b[31] = '0';
+    if(!ena) inversor(a);   // para a = 11111111111111111111111111111111, desativar basta inverte-lo
+    if(!enb) b[31] = '0';   // para b = 00000000000000000000000000000001, desativar basta mudar o último bit para 0
     
-    //if(inva) *a = ~(*a); CHAMAR FUNÇÃO DE INVERTER NUMERO POR STRING
+    // inversão de a.
     if (inva) inversor(a);
 }
 
@@ -69,6 +62,7 @@ void and(char* a, char* b, char* s){
 }
 
 void or(char *a, char *b, char *s) {
+    // lógica do operador OR
     for (int i = 0; i < 32; i++) {
         if (a[i] == '0' && b[i] == '0') {
             s[i] = '0';
@@ -88,7 +82,7 @@ void somaArit(char *a, char *b, char *co, char *s) {
         if (a[i] != b[i]) soma = 1; // simula o a^b
         else soma = 0;
 
-        if (carry) {
+        if (carry) {    // se tem carry da operação anterior
             carry = soma && carry;
             soma = soma^1;
         }
@@ -120,10 +114,12 @@ void inversor(char *a) {
 }
 
 void incremento(char *s, char *co) {
+    // adiciona 1 ao final, que deve ser processado como uma soma aritmética por conta da possibilidade de haver um carry
     somaArit(s, "00000000000000000000000000000001", co, s);
 }
 
 void logCiclo(int pc, char* ir, char* a, char* b, char* s, char co) {
+    // printando o resultado do ciclo
     if (pc == 1) {
         printf("b = %s\n", b);
         printf("a = %s\n\n", a);
