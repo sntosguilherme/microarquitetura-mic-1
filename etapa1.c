@@ -1,129 +1,94 @@
-/* OQ FAZ CADA COMPONENTE
-A: OPERANDO 1
-B: OPERANDO 2
-ENA: Enable A. Quando está em 0, qualquer valor em A é ignorado e se torna 0. 
-ENB: Enable B. Quando está em 0, qualquer valor em B é ignorado e se torna 0.
-INVA: Inverte A bit a bit.
-INC: Guarda o vai-um. Soma 1 ao resultado final.
-F0 e F1: Em conjunto definem a operação a ser realizada.
-
-Conjunto de operações:
-    F0 = 0 e F1 = 0  -> indica que a saída é igual a A && B (A and B)
-    F0 = 0 e F1 = 1  -> indica que a saída é igual a A | B  (A or B)
-    F0 = 1 e F1 = 0  -> indica que a saída é igual ao complemento de B
-    F0 = 1 e F1 = 1  -> indica que a saída é igual a soma aritmética
-
-Detalhe: 
-    -co é carry on na saída (valor de vai um) para os mafiosos
-
-Planejamento da execução do programa
-    1- Armazenamento das variáveis iniciais A e B
-    2- Abrir o arquivo de leitura, armazenar a linha e a palavra 
-    3- Armazenamento da combinação de sinais
-    4- Processamento das instruções 
-    5- Escrita dos valores de IR, PC, A, B, S e o Vai-um no log
-    6- Próxima linha
-*/
-
-// Protótipos das funções
-
-// aplica ENA, ENB, INVA em A e B.
-// por meio de f0 e f1 determina qual operacao sera realizada em A e B.
-// recebe F1, F2, A e B para poder repassar esses parâmetros caso necessário
-// retorna saída
-
-#include <stdio.h>
+#include "etapa1.h"
 #include <stdlib.h>
 #include <string.h>
 
-void processamentoEntradas(char * ir, char*a, char*b, unsigned int * aNum, unsigned int * bNum);
-unsigned int calculoULA(int f0, int f1, char* A, char* B, char* co);
-char* and(unsigned int A, unsigned int B);
-char* or(unsigned int A, unsigned int B);
-char* compleB(unsigned int B);
-char* somaArit(unsigned int, unsigned int, char* co);
-
-
-int main(){
-    // A e B iniciais
-    char b[] = "00000000000000000000000000000001";
-    char a[] = "11111111111111111111111111111111";
-
-    // leitura do arquivo
-    char arquivo[] = "programa_etapa1.txt";
-    FILE *leitura;
-    leitura = fopen(arquivo, "r");
-    
-    if (leitura == NULL) printf("Erro ao abrir o arquivo.");     // checagem da abertura correta do arquivo
-
-    int PC = 0;     // contador de programa
-    char IR[7];     // registrador de instrução
-
-    // o contador vai identificar qual linha do arquivo está sendo lido, enquanto o registrador da respectiva linha
-    // armazena a palavra de 6 bits contida nela
-
-    while (fgets(IR, sizeof(IR), leitura) != NULL) {
-        PC++;
-        // a ideia aqui é fazer os passos 2, 3, 4 e 5
-        unsigned int aNum;
-        unsigned int bNum;
-        processamentoEntradas(IR, a, b, &aNum, &bNum);
+unsigned int somar(unsigned int a, unsigned int b, int *carry) {
+    // Centraliza a lógica de soma com 64 bits para facilitar a captura do Carry Out.
+    unsigned long long temp = (unsigned long long) a + b;
+    if (carry) {
+        *carry = (temp >> 32) & 1;
     }
-
-    fclose(leitura);
-    return 0;
+    return (unsigned int) temp;
 }
 
-unsigned int calculoULA(int f0, int f1, char* A, char* B, char* co){
-    unsigned int s = 0; // Saída do programa
-
+unsigned int calculoULA(int f0, int f1, unsigned int A, unsigned int B, int *co) {
+    unsigned int s = 0;
     *co = 0;
 
-    // direcionando para a operação correta a partir das entradas F0 e F1
-    if(f0 == 0 && f1 == 0){ // AND
-        s = A & B;
-    }
+    // F0 = 0 e F1 = 0 -> Saída é A AND B
+    if (f0 == 0 && f1 == 0) s = A & B;
 
-    if(f0 == 0 && f1 == 1){ // OR
-        s = A | B;
-    }
+    // F0 = 0 e F1 = 1 -> Saída é A OR B
+    else if (f0 == 0 && f1 == 1) s = A | B;
 
-    if(f0 == 1 && f1 == 0){ // B complemento
-        s = ~B;
-    }
+    // F0 = 1 e F1 = 0 -> Saída é o complemento de A (Inverte todos os bits)
+    else if (f0 == 1 && f1 == 0) s = ~A;
 
-    if(f0 == 1 && f1 == 1){ // SUM
-        
+    // F0 = 1 e F1 = 1 -> Saída é a soma aritmética de A e B
+    else if (f0 == 1 && f1 == 1){
+        // Delegado para a função auxiliar de soma para tratar o Carry Out (vai um)
+        s = somar(A, B, co);
     }
 
     return s;
 }
 
-void processamentoEntradas(char * ir, char*a, char*b, unsigned int * aNum, unsigned int * bNum){ 
-    // Separando as  instruções em variáveis e convertendo para inteiro.
+void processamentoEntradas(char *ir, unsigned int *A, unsigned int *B, FILE *log, int pc) {
+    // Converte os caracteres do array de instrução (ir) para valores numéricos inteiros (0 ou 1)
+    // Subtrair '0' do valor atual do índice da string, revela o valor numérico inteiro esperado.
     int f0 = ir[0] - '0';
     int f1 = ir[1] - '0';
-    
     int ena  = ir[2] - '0';
     int enb  = ir[3] - '0';
     int inva = ir[4] - '0';
     int inc  = ir[5] - '0';
 
-    // convertendo A e B para unsigned int ( 32 bits ) para aplicar as operações.
-    // strtoul converte uma string para um unsigned long. 
-    // os parâmetros são a string, um ponteiro para onde a conversao parou (irrelevante no projeto) e a base numérica para qual será convertida. 2 = base binária.
-    *aNum = strtoul(a, NULL, 2);  
-    *bNum = strtoul(b, NULL, 2); 
-    
-    // aplicando os enables.
-    if(!ena) *aNum = 0;
-    if(!enb) *bNum = 0;
-    
-    //invertendo A bit a bit caso INVA == 1. o operador '~' cumpre essa função.
-    if(inva) *aNum = ~(*aNum);
+    // Salva o estado original em temporários para não alterar permanentemente os conteúdos de A e B
+    unsigned int aTemp = *A;
+    unsigned int bTemp = *B;
 
-    // aplicando o inc para ser mudado apenas no cáculo ULA
-    char co = 0;
+    // Aplica os sinais de controle nos temporários antes de serem enviados à ULA
+    // Se ENA (Enable A) estiver desligado (0), ignora A e substitui por 0
+    if (!ena) aTemp = 0;
+    // Se ENB (Enable B) estiver desligado (0), ignora B e substitui por 0
+    if (!enb) bTemp = 0;
+    // Se INVA (Invert A) for verdadeiro, inverte todos os bits armazenados em aTemp usando NOT (~)
+    if (inva) aTemp = ~aTemp;
 
-    unsigned int s = calculoULA(f0, f1, *aNum, *bNum, &co);
+    // LOG: estado ANTES das operações, mas com as portas já fechadas/abertas
+    fprintf(log, "IR = %s\n", ir);
+
+    fprintf(log, "b = ");
+    printBin(bTemp, log);
+    fprintf(log, "\n");
+
+    fprintf(log, "a = ");
+    printBin(aTemp, log);
+    fprintf(log, "\n");
+
+    int co = 0;
+    unsigned int S = calculoULA(f0, f1, aTemp, bTemp, &co);
+
+    // Incremento: Se verdadeiro, adiciona +1 ao resultado final vindo da ULA
+    if (inc) {
+        // Delegado para a função auxiliar, reaproveitando o tratamento de overflow em 64 bits
+        S = somar(S, 1, &co);
+    }
+
+    // LOG: resultado
+    fprintf(log, "s = ");
+    printBin(S, log);
+    fprintf(log, "\n");
+
+    fprintf(log, "co = %d\n", co);
+
+}
+
+void printBin(unsigned int num, FILE *out){
+    // Percorre os índices dos bits do mais significativo 31 ao menos significativo 0
+    for(int i = 31; i >= 0; i--){
+        // O bit shift para a direita (num >> i) garante que o bit desejado estará na direita agora
+        // do valor final avaliado, o permitindo ser isolado pelo operador (& 1) resultando em 0 ou 1.
+        fprintf(out, "%d", (num >> i) & 1);
+    }
 }
