@@ -29,12 +29,13 @@ Planejamento da execução do programa
 
 // Protótipos para visualizar melhor os tipos das funções
 void processamentoEntradas(char * ir, char * a, char * b);
-void and(char* a, char* b, char* s);
 char* calculoULA(int f0, int f1, char * a, char * b, char* co, char *s);
+void and(char* a, char* b, char* s);
 void or(char * a, char * b, char *s);
 void somaArit(char * a, char * b, char * co, char *s);
 void incremento(char *s, char *co);
 void inversor(char *a);
+void zerar(char *a);
 void logCiclo(int pc, char* ir, char* a, char* b, char* s, char co, FILE* log);
 
 int main(){
