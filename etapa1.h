@@ -139,7 +139,7 @@ void logCiclo(int pc, char* ir, char* a, char* b, char* s, char co, FILE*log) {
 
     fprintf(log,"Ciclo %d\n\n", pc);
     fprintf(log,"PC = %d\n", pc);
-    fprintf(log,"IR = %s\n", ir);
+    fprintf(log,"IR = %.6s\n", ir); // limitando exibição para os 6 primeiros chars para evitar quebra de linha.
     fprintf(log,"b = %s\n", b);
     fprintf(log,"a = %s\n", a);
     fprintf(log,"s = %s\n", s);
