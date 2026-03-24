@@ -14,7 +14,7 @@ Conjunto de operações:
     F0 = 1 e F1 = 1  -> indica que a saída é igual a soma aritmética
 
 Detalhe: 
-    -co é carry on na saída (valor de vai um) para os mafiosos
+    -co é carry on na saída (valor de vai um)
 
 Planejamento da execução do programa
     1- Armazenamento das variáveis iniciais A e B
@@ -50,7 +50,7 @@ int main(){
     int f0;
     int f1;
 
-    // leitura do arquivo
+    // abertura do arquivo de entrada
     char arquivo[] = "entrada-e-saida/programa_etapa1.txt";
     FILE *leitura;
     leitura = fopen(arquivo, "r");
@@ -73,12 +73,10 @@ int main(){
     while (fgets(IR, sizeof(IR), leitura) != NULL) {
         char b[] = "00000000000000000000000000000001";
         char a[] = "11111111111111111111111111111111";
-        PC++;
-        // a ideia aqui é fazer os passos 2, 3, 4 e 5
-
+        PC++; // incrementando o pc a cada ciclo
         co = '0';
         f0 = IR[0] - '0';
-        f1 = IR[01] - '0';
+        f1 = IR[1] - '0';
         
         processamentoEntradas(IR, a, b);
         calculoULA(f0, f1, a, b, &co, s);
@@ -88,6 +86,7 @@ int main(){
         logCiclo(PC, IR, a, b, s, co, log);
     }
 
+    printf("log armazenado com sucesso em entrada-e-saida/saida.txt.\n");
     fclose(leitura);
     fclose(log);
     return 0;
