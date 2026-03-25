@@ -3,12 +3,13 @@
 #include <string.h>
 
 void processamentoEntradas(char * ir, char * a, char * b);
-void and(char* a, char* b, char* s);
 char* calculoULA(int f0, int f1, char * a, char * b, char* co, char *s);
+void and(char* a, char* b, char* s);
 void or(char * a, char * b, char *s);
 void somaArit(char * a, char * b, char * co, char *s);
 void incremento(char *s, char *co);
 void inversor(char *a);
+void zerar(char *a);
 void logCiclo(int pc, char* ir, char* a, char* b, char* s, char co, FILE* log);
 
 void processamentoEntradas(char* ir, char* a, char* b){ 
@@ -19,8 +20,8 @@ void processamentoEntradas(char* ir, char* a, char* b){
     int inc  = ir[5] - '0';
     
     // aplicando os enables.
-    if(!ena) inversor(a);   // para a = 11111111111111111111111111111111, desativar basta inverte-lo
-    if(!enb) b[31] = '0';   // para b = 00000000000000000000000000000001, desativar basta mudar o último bit para 0
+    if(!ena) zerar(a);
+    if(!enb) zerar(b);
     
     // inversão de a.
     if (inva) inversor(a);
@@ -118,6 +119,13 @@ void incremento(char *s, char *co) {
     somaArit(s, "00000000000000000000000000000001", co, s);
 }
 
+void zerar(char *a) {
+    // substitui todos os bits por 0
+    for(int i = 0; a[i] != '\0'; i++) {
+        a[i] = '0';
+    }
+}
+
 void logCiclo(int pc, char* ir, char* a, char* b, char* s, char co, FILE*log) {
     // printando o resultado do ciclo
 
@@ -131,7 +139,7 @@ void logCiclo(int pc, char* ir, char* a, char* b, char* s, char co, FILE*log) {
 
     fprintf(log,"Ciclo %d\n\n", pc);
     fprintf(log,"PC = %d\n", pc);
-    fprintf(log,"IR = %s\n", ir);
+    fprintf(log,"IR = %.6s\n", ir); // limitando exibição para os 6 primeiros chars para evitar quebra de linha.
     fprintf(log,"b = %s\n", b);
     fprintf(log,"a = %s\n", a);
     fprintf(log,"s = %s\n", s);
