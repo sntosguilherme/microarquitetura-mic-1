@@ -8,6 +8,8 @@ void barramentoB(char *ir, char *b, char *b_bus, char *opc, char *tos, char *cpp
 void barramentoC(char *ir, char *sd, char *c_bus, char *h, char *opc, char *tos, char *cpp, char *lv, char *sp, char *pc, char *mdr, char *mar);
 int erro(int pc, char* ir, char* a0, char* b0, char* a, char* b, int sll8, int sra1, FILE* log);
 void logCiclo2(int pc, char* ir, char* a0, char* b0, char* a, char* b, char* s, char* sd, char co, int n, int z, FILE* log);
+int calcularN(char *sd);
+int calcularZ(char *sd);
 
 void processamentoEntradas2(char* ir, char* a, char* b){ 
     // em relação a função processamentoEntradas, só foi mudado o index, já que mudamos a quantidade de bits da instrução
@@ -186,4 +188,17 @@ void logCiclo2(int pc, char* ir, char* a0, char* b0, char* a, char* b, char* s, 
     fprintf(log,"co = %c\n\n", co);
     fprintf(log,"==============================================\n");
 
+}
+int calcularFlagN(char *sd) {
+    if (sd[0] == '1') return 1; // caso o primeiro bit seja 1, a flag será 1.
+    return 0;
+}
+
+int calcularFlagZ(char *sd) {
+    for (int i = 0; i < 32; i++) { // itera sobre todos os bits, se encontrare um 1 a flag será 0. 
+        if (sd[i] == '1') {
+            return 0;
+        }
+    }
+    return 1;
 }
