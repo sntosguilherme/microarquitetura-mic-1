@@ -3,11 +3,13 @@
 int bin2dec(char *x);  // função auxiliar pra conversão binário para decimal
 void barramentoB(char *ir, char *b, char *b_bus, char *opc, char *tos, char *cpp, char *lv, char *sp, char *pc, char *mdr, char *mar, char *mbr);
 void barramentoC(char *ir, char *sd, char *c_bus, char *h, char *opc, char *tos, char *cpp, char *lv, char *sp, char *pc, char *mdr, char *mar);
+void processarC_bus(char *ir, char *c_bus);
 void printC_bus(char *c_bus, FILE* log);
 
 int erro(int pc, char* IR, FILE *log);
 
-void logEt2Tar2(char *ir, int cycle, char *b_bus, char *c_bus, char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log);
+void logEntrada(char *ir, int cycle, char *b_bus, char *c_bus, char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log);
+void logFinal(char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log);
 
 
 int bin2dec(char *x) {
@@ -97,25 +99,23 @@ void barramentoB(char *ir, char *b, char *b_bus, char *opc, char *tos, char *cpp
 void barramentoC(char *ir, char *sd, char *c_bus, char *h, char *opc, char *tos, char *cpp, char *lv, char *sp, char *pc, char *mdr, char *mar) {
     
     // vai pegar 9 bits de ir e ver qual bits tão habilitados, selecionando os registradores e sobreescrevendo eles por sd
-    for(int i = 8, j = 0; i < 17; i++, j++) {
-        c_bus[j] = ir[i];
-
+    for(int i = 0; i < 9; i++) {
         if (c_bus[i] == '1') {
-            switch(i-8) {
+            switch(8-i) {
             case 0:
-                strcpy(h, sd);
+                strcpy(mar, sd);
                 break;
 
             case 1:
-                strcpy(opc, sd);
+                strcpy(mdr, sd);
                 break;
 
             case 2:
-                strcpy(tos, sd);
+                strcpy(pc, sd);
                 break;
 
             case 3:
-                strcpy(cpp, sd);
+                strcpy(sp, sd);
                 break;  
 
             case 4:
@@ -123,19 +123,19 @@ void barramentoC(char *ir, char *sd, char *c_bus, char *h, char *opc, char *tos,
                 break;
 
             case 5:
-                strcpy(sp, sd);
+                strcpy(cpp, sd);
                 break;
 
             case 6:
-                strcpy(pc, sd);
+                strcpy(tos, sd);
                 break;  
 
             case 7:
-                strcpy(mdr, sd);
+                strcpy(opc, sd);
                 break;
 
             case 8:
-                strcpy(mar, sd);
+                strcpy(h, sd);
                 break;
             }
         }
@@ -151,6 +151,14 @@ int erro(int pc, char* IR, FILE *log) {
     }
 
     return 0;
+}
+
+// chamar na main ANTES do logEntrada e do barramento C
+void processarC_bus(char *ir, char *c_bus) {
+    
+    for(int i = 8, j = 0; i < 17; i++, j++) {
+        c_bus[j] = ir[i];
+    }
 }
 
 void printC_bus(char *c_bus, FILE* log) {
@@ -238,26 +246,26 @@ void printC_bus(char *c_bus, FILE* log) {
     fprintf(log, "\n");
 }
 
-void logEt2Tar2(char *ir, int cycle, char *b_bus, char *c_bus, char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log) {
+void logEntrada(char *ir, int cycle, char *b_bus, char *c_bus, char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log) {
 
     // se cycle iniciar com 0 mudar isso
-    if (cycle == 1) {
+    if (cycle == 1) {   // colocando como string caso ela bote registradores diferentes
         fprintf(log, "==============================================\n");
         fprintf(log, "> Estado dos registradores iniciais\n");
-        fprintf(log, "mar = 00000000000000000000000000000000\n "
-                     "mdr = 00000000000000000000000000000000\n "
-                     "pc = 00000000000000000000000000000000\n "
-                     "mbr = 10000001\n "
-                     "sp = 00000000000000000000000000000000\n "
-                     "lv = 00000000000000000000000000000000\n "
-                     "cpp = 00000000000000000000000000000000\n "
-                     "tos = 00000000000000000000000000000010\n "
-                     "opc = 00000000000000000000000000000000\n "
-                     "h = 00000000000000000000000000000001\n ");
+        fprintf(log, "mar = %s\n "
+                     "mdr = %s\n "
+                     "pc = %s\n "
+                     "mbr = %s\n "
+                     "sp = %s\n "
+                     "lv = %s\n "
+                     "cpp = %s\n "
+                     "tos = %s\n "
+                     "opc = %s\n "
+                     "h = %s\n ", mar, mdr, pc, mbr, sp, lv, cpp, tos, opc, h);
     
         fprintf(log, "==============================================\n"
                      "Começando!\n");
-                    }
+    }
     
     
     fprintf(log, "==============================================\n");
@@ -274,16 +282,32 @@ void logEt2Tar2(char *ir, int cycle, char *b_bus, char *c_bus, char *mar, char *
     fprintf(log, "c_bus: ");
     printC_bus(c_bus, log);
 
+    fprintf(log, "> Registradores antes da instrução\n");
+    fprintf(log, "mar = %s\n", mar);
+    fprintf(log, "mdr = %s\n", mdr);
+    fprintf(log, "pc = %s\n", pc);
+    fprintf(log, "mbr = %s\n", mbr);
+    fprintf(log, "sp = %s\n", sp);
+    fprintf(log, "lv = %s\n", lv);
+    fprintf(log, "cpp = %s\n", cpp);
+    fprintf(log, "tos = %s\n", tos);
+    fprintf(log, "opc = %s\n", opc);
+    fprintf(log, "h = %s\n\n", h);
+    
+}
+
+void logFinal(char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log) {
+
     fprintf(log, "> Registradores depois da instrução\n");
-    fprintf(log, "mar = %s", mar);
-    fprintf(log, "mar = %s", mdr);
-    fprintf(log, "mar = %s", pc);
-    fprintf(log, "mar = %s", mbr);
-    fprintf(log, "mar = %s", sp);
-    fprintf(log, "mar = %s", lv);
-    fprintf(log, "mar = %s", cpp);
-    fprintf(log, "mar = %s", tos);
-    fprintf(log, "mar = %s", opc);
-    fprintf(log, "mar = %s", h);
+    fprintf(log, "mar = %s\n", mar);
+    fprintf(log, "mdr = %s\n", mdr);
+    fprintf(log, "pc = %s\n", pc);
+    fprintf(log, "mbr = %s\n", mbr);
+    fprintf(log, "sp = %s\n", sp);
+    fprintf(log, "lv = %s\n", lv);
+    fprintf(log, "cpp = %s\n", cpp);
+    fprintf(log, "tos = %s\n", tos);
+    fprintf(log, "opc = %s\n", opc);
+    fprintf(log, "h = %s\n\n", h);
     
 }
