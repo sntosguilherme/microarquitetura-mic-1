@@ -36,7 +36,14 @@ Detalhe:
     Etapa2 - Tarefa2:
         Novos registradores:
             9 de 32 bits    ->  H, OPC, TOS, CPP, LV, SP, PC, MDR e MAR
+            H: Holding. Armazena dados que estão sendo transferidos pela memória
+            MAR: Memory Address Register. Guarda o endereço onde a leitura ou escrita na memória será realizada.
+            MDR: Memory Data Register. Guarda o dado que acabou de vir da memória ou que será enviado para ela.
+            PC: Program Counter. Endereço da próxima instrução que a máquina buscará.
             1 de 8 bits     ->  MBR (ele vai ser completado os 32 bits dependendo do barramento B)
+            MBR: Recebe apenas 8 bits. Pode Entrar no barramento de 2 maneiras:
+                Forma 1: O bit mais à esquerda (índice 0 da string de 8 bits) é repetido 24 vezes antes do valor original.
+                Forma 2: Quando o byte é apenas um índice ou valor positivo. Preenche os 24 bits da esquerda com 0. 
 
         Vamos receber agora palavras de 21 bits: 8 bits de controle da ULA, 9 bits barramento c, 4 bits barramento B
             - Bits do controle da ULA vão ser o que já temos implementado;
