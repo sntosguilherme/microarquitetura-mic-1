@@ -96,18 +96,12 @@ void barramentoB(char *ir, char *b, char *b_bus, char *opc, char *tos, char *cpp
         
         break;
     
-    case 3: // MBRU com 24 primeiros bits iguais a 0
+    // Quando MBRU é selecionado, a palavra deve ser preenchida até 32 bits utilizando zeros.
+    case 3: 
         strcpy(b_bus, "mbru");
-        int j = 0;
-        for (int i = 0; i < 32; i++) {
-            if (i < 24)
-                b[i] = x;
-            else {
-                b[i] = mbr[j];
-                j++;
-            }
-        }
-
+        
+        zerar(b);
+        
         break;
 
     case 4:
