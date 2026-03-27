@@ -36,7 +36,7 @@ void somaArit(char * a, char * b, char * co, char *s);
 void incremento(char *s, char *co);
 void inversor(char *a);
 void zerar(char *a);
-void logCiclo(int pc, char* ir, char* a, char* b, char* s, char co, FILE* log);
+void logCiclo(int pc, char* ir, char* a0, char* b0, char* a, char* b, char* s, char co, FILE* log);
 
 int main(){
     // Declarações
@@ -71,8 +71,15 @@ int main(){
     // armazena a palavra de 6 bits contida nela
 
     while (fgets(IR, sizeof(IR), leitura) != NULL) {
-        char b[] = "00000000000000000000000000000001";
-        char a[] = "11111111111111111111111111111111";
+        // b e a iniciais
+        char b0[] = "00000000000000000000000000000001";
+        char a0[] = "11111111111111111111111111111111";
+
+        // cópias a serem mudadas
+        char a[33], b[33];
+        strcpy(a, a0);
+        strcpy(b, b0);
+
         PC++; // incrementando o pc a cada ciclo
         co = '0';
         f0 = IR[0] - '0';
@@ -83,7 +90,7 @@ int main(){
 
         if (IR[5] == '1') incremento(s, &co);
 
-        logCiclo(PC, IR, a, b, s, co, log);
+        logCiclo(PC, IR, a0, b0, a, b, s, co, log);
     }
 
     printf("log armazenado com sucesso em entrada-e-saida/saida.txt.\n");

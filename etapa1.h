@@ -10,7 +10,7 @@ void somaArit(char * a, char * b, char * co, char *s);
 void incremento(char *s, char *co);
 void inversor(char *a);
 void zerar(char *a);
-void logCiclo(int pc, char* ir, char* a, char* b, char* s, char co, FILE* log);
+void logCiclo(int pc, char* ir, char* a0, char* b0, char* a, char* b, char* s, char co, FILE* log);
 
 void processamentoEntradas(char* ir, char* a, char* b){ 
     // Separando as  instruções em variáveis e convertendo para inteiro.
@@ -126,12 +126,12 @@ void zerar(char *a) {
     }
 }
 
-void logCiclo(int pc, char* ir, char* a, char* b, char* s, char co, FILE*log) {
+void logCiclo(int pc, char* ir, char* a0, char* b0, char* a, char* b, char* s, char co, FILE* log) {
     // printando o resultado do ciclo
 
     if (pc == 1) {
-        fprintf(log, "b = %s\n", b);
-        fprintf(log, "a = %s\n\n", a);
+        fprintf(log, "b = %s\n", b0);
+        fprintf(log, "a = %s\n\n", a0);
 
         fprintf(log, "Comecando!!!!\n");
         fprintf(log,"==============================================\n\n");
