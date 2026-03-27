@@ -98,7 +98,7 @@ int main(){
 
         // pra armazenar quais registradores foram escolhidos pelo barramento
     char *b_bus;
-    char c_bus[4][10];  // lista de string dos registradores escolhidos no barramento C
+    char c_bus[9];  // lista de string dos registradores escolhidos no barramento C
 
     // leitura do arquivo
     char arquivo[] = "exemplos_projeto/programa_etapa2_tarefa1.txt";

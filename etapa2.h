@@ -132,9 +132,139 @@ void barramentoB(char *ir, char *b, char *b_bus, char *opc, char *tos, char *cpp
 }
 
 void barramentoC(char *ir, char *sd, char *c_bus, char *h, char *opc, char *tos, char *cpp, char *lv, char *sp, char *pc, char *mdr, char *mar) {
+    
     // vai pegar 9 bits de ir e ver qual bits tão habilitados, selecionando os registradores e sobreescrevendo eles por sd
+    for(int i = 8, j = 0; i < 17; i++, j++) {
+        c_bus[j] = ir[i];
+
+        if (c_bus[i] == '1') {
+            switch(i-8) {
+            case 0:
+                strcpy(h, sd);
+                break;
+
+            case 1:
+                strcpy(opc, sd);
+                break;
+
+            case 2:
+                strcpy(tos, sd);
+                break;
+
+            case 3:
+                strcpy(cpp, sd);
+                break;  
+
+            case 4:
+                strcpy(lv, sd);
+                break;
+
+            case 5:
+                strcpy(sp, sd);
+                break;
+
+            case 6:
+                strcpy(pc, sd);
+                break;  
+
+            case 7:
+                strcpy(mdr, sd);
+                break;
+
+            case 8:
+                strcpy(mar, sd);
+                break;
+            }
+        }
+    }
 }
 
+// função que printa quais registradores estão habilitados no barramento C
+void printC_bus(char *c_bus) {
+    // usado pra printar de forma organizada que nem o dela
+    int counterRegs = 0;
+    
+    for (int i = 0; i < 9; i++) {
+        if (c_bus[i] == '1') counterRegs++;
+    }
+
+    if (!counterRegs){
+        printf("Nenhum\n");
+        return;
+    }
+
+    for (int i = 0; i < 9 && counterRegs; i++) {
+        if (c_bus[i] == '1') {
+            switch(i-8) {
+            case 0:
+                printf("h");
+                if (counterRegs > 1) printf(", ");
+
+                counterRegs--;
+                break;
+
+            case 1:
+                printf("opc");
+                if (counterRegs > 1) printf(", ");
+
+                counterRegs--;
+                break;
+
+            case 2:
+                printf("tos");
+                if (counterRegs > 1) printf(", ");
+
+                counterRegs--;
+                break;
+
+            case 3:
+                printf("cpp");
+                if (counterRegs > 1) printf(", ");
+
+                counterRegs--;
+                break;  
+
+            case 4:
+                printf("lv");
+                if (counterRegs > 1) printf(", ");
+
+                counterRegs--;
+                break;
+
+            case 5:
+                printf("sp");
+                if (counterRegs > 1) printf(", ");
+
+                counterRegs--;
+                break;
+
+            case 6:
+                printf("pc");
+                if (counterRegs > 1) printf(", ");
+
+                counterRegs--;
+                break;  
+
+            case 7:
+                printf("mdr");
+                if (counterRegs > 1) printf(", ");
+
+                counterRegs--;
+                break;
+
+            case 8:
+                printf("mar");
+                if (counterRegs > 1) printf(", ");
+
+                counterRegs--;
+                break;
+            }
+        }
+    }
+    
+        
+    
+}
 int erro(int pc, char* ir, char* a0, char* b0, char* a, char* b, int sll8, int sra1, FILE* log) {
     if (sll8 && sra1) {
         // inicialmente igual ao logCiclo
@@ -193,6 +323,6 @@ int calcularFlagZ(char *sd) {
         if (sd[i] == '1') {
             return 0;
         }
-    }
+        }
     return 1;
 }
