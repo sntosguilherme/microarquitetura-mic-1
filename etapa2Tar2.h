@@ -23,7 +23,7 @@ int bin2dec(char *x) {
         base *= 2;
     }
 
-    return decimal
+    return decimal;
 }
 
 void barramentoB(char *ir, char *b, char *b_bus, char *opc, char *tos, char *cpp, char *lv, char *sp, char *pc, char *mdr, char *mar, char *mbr) {
