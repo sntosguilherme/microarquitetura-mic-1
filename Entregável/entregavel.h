@@ -9,11 +9,11 @@
 */
 
 
-void ILOAD(char *h, int x, char *lv, char *mar, char *sp, char *tos, char *mdr);
-void DUP(char *mar, char *sp, char *mdr, char *tos);
-void BYPUSH(char *h, char *byte, char *sp, char *mar, char *mdr, char *tos);
+void ILOAD(char *h, int x, char *lv, char *mar, char *sp, char *tos, char *mdr, char memoria[8][33]);
+void DUP(char *mar, char *sp, char *mdr, char *tos, char memoria[8][33]);
+void BYPUSH(char *h, char *byte, char *sp, char *mar, char *mdr, char *tos, char memoria[8][33]);
 
-void ILOAD(char *h, int x, char *lv, char *mar, char *sp, char *tos, char *mdr) {
+void ILOAD(char *h, int x, char *lv, char *mar, char *sp, char *tos, char *mdr, char memoria[8][33]) {
 
     // H = LV
     strcpy(h, lv);
@@ -26,18 +26,24 @@ void ILOAD(char *h, int x, char *lv, char *mar, char *sp, char *tos, char *mdr) 
     // mar = h; rd
     mar = h;
 
+    // rd
+    strcpy(mdr, memoria[bin2dec(mar)]);
+
     // sp = sp + 1
     char fakeCo = '0';
     incremento(sp, &fakeCo);
     
     // mar = sp = sp + 1; wr
     strcpy(mar, sp);
+
+    // wr 
+    strcpy(memoria[bin2dec(mar)], mdr);
     
     // tos = mdr
     strcpy(tos, mdr);
 }
 
-void DUP(char *mar, char *sp, char *mdr, char *tos) {
+void DUP(char *mar, char *sp, char *mdr, char *tos, char memoria[8][33]) {
     // sp = sp + 1
     char fakeCo = '0';
     incremento(sp, &fakeCo);
@@ -47,9 +53,12 @@ void DUP(char *mar, char *sp, char *mdr, char *tos) {
 
     // mdr = tos; wr
     strcpy(mdr, tos);
+
+    // wr 
+    strcpy(memoria[bin2dec(mar)], mdr);
 }
 
-void BYPUSH(char *h, char* byte, char *sp, char *mar, char *mdr, char* mbr, char *tos) {
+void BYPUSH(char *h, char* byte, char *sp, char *mar, char *mdr, char* mbr, char *tos, char memoria[8][33]) {
     // sp = sp + 1
     char fakeCo = '0';
     incremento(sp, &fakeCo);
@@ -80,4 +89,7 @@ void BYPUSH(char *h, char* byte, char *sp, char *mar, char *mdr, char* mbr, char
 
     // mdr = tos = h; wr
     strcpy(mdr, tos);
+
+    // wr 
+    strcpy(memoria[bin2dec(mar)], mdr);
 }
