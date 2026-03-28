@@ -51,7 +51,7 @@ int main(){
     int f1;
 
     // abertura do arquivo de entrada
-    char arquivo[] = "entrada-e-saida/programa_etapa1.txt";
+    char arquivo[] = "entrada-e-saida-etapa1/programa_etapa1.txt";
     FILE *leitura;
     leitura = fopen(arquivo, "r");
     
@@ -61,7 +61,7 @@ int main(){
     }
 
     // abertura do arquivo de saida do log
-    FILE * log = fopen("entrada-e-saida/saida.txt", "w");
+    FILE * log = fopen("entrada-e-saida-etapa1/saida.txt", "w");
     if(!log) {
         printf("Erro ao abrir o arquivo de log.\n");
         return 1;
