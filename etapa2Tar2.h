@@ -6,7 +6,7 @@ void barramentoC(char *ir, char *sd, char *c_bus, char *h, char *opc, char *tos,
 void processarC_bus(char *ir, char *c_bus);
 void printC_bus(char *c_bus, FILE* log);
 
-int erro(int pc, char* IR, FILE *log);
+int erro2(int pc, char* IR, FILE *log);
 
 void logEntrada(char *ir, int cycle, char *b_bus, char *c_bus, char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log);
 void logFinal(char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log);
@@ -14,13 +14,16 @@ void logFinal(char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, cha
 
 int bin2dec(char *x) {
     int decimal = 0;
-    int base = 1;
+    int base = 8;
 
-    for (int i = strlen(x) - 1; i >= 0; i--) {
+    // printf("String -> %s \nTamanho -> %d\n\n", x, strlen(x));
+
+    for (int i = 0; i < 4; i++) {
         if (x[i] == '1') {
             decimal += base;
         }
-        base *= 2;
+        base /= 2;
+
     }
 
     return decimal;
@@ -34,6 +37,8 @@ void barramentoB(char *ir, char *b, char *b_bus, char *opc, char *tos, char *cpp
         ctrlB[i] = ir[i+17];
     }
 
+    printf("Seliga -> %d\n\n", bin2dec(ctrlB));
+    printf("Passei\n");
     switch (bin2dec(ctrlB)) {
     case 0:
         strcpy(b, mdr);
@@ -48,7 +53,7 @@ void barramentoB(char *ir, char *b, char *b_bus, char *opc, char *tos, char *cpp
     case 2: // MBR com 24 primeiros bits iguais ao bit mais alto
         strcpy(b_bus, "mbr");
         char x = mbr[0];
-        int j;
+        int j = 0;
 
         for (int i = 0; i < 32; i++) {
             if (i < 24)         // de 0 a 23 é preenchido pelo caractere
@@ -142,7 +147,7 @@ void barramentoC(char *ir, char *sd, char *c_bus, char *h, char *opc, char *tos,
     }
 }
 
-int erro(int pc, char* IR, FILE *log) {
+int erro2(int pc, char* IR, FILE *log) {
     if (IR[0] == '1' && IR[1] == '1') {
         fprintf(log, "Ciclo %d\n\n", pc);
         fprintf(log,"> Erro! Instrucao invalida.\n");
@@ -176,7 +181,7 @@ void printC_bus(char *c_bus, FILE* log) {
 
     for (int i = 0; i < 9 && counterRegs; i++) {
         if (c_bus[i] == '1') {
-            switch(i-8) {
+            switch(i) {
             case 0:
                 fprintf(log, "h");
                 if (counterRegs > 1) fprintf(log, ", ");
@@ -248,20 +253,20 @@ void printC_bus(char *c_bus, FILE* log) {
 
 void logEntrada(char *ir, int cycle, char *b_bus, char *c_bus, char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log) {
 
-    // se cycle iniciar com 0 mudar isso
+    
     if (cycle == 1) {   // colocando como string caso ela bote registradores diferentes
         fprintf(log, "==============================================\n");
         fprintf(log, "> Estado dos registradores iniciais\n");
-        fprintf(log, "mar = %s\n "
-                     "mdr = %s\n "
-                     "pc = %s\n "
-                     "mbr = %s\n "
-                     "sp = %s\n "
-                     "lv = %s\n "
-                     "cpp = %s\n "
-                     "tos = %s\n "
-                     "opc = %s\n "
-                     "h = %s\n ", mar, mdr, pc, mbr, sp, lv, cpp, tos, opc, h);
+        fprintf(log, "mar = %s\n"
+                     "mdr = %s\n"
+                     "pc = %s\n"
+                     "mbr = %s\n"
+                     "sp = %s\n"
+                     "lv = %s\n"
+                     "cpp = %s\n"
+                     "tos = %s\n"
+                     "opc = %s\n"
+                     "h = %s\n\n", mar, mdr, pc, mbr, sp, lv, cpp, tos, opc, h);
     
         fprintf(log, "==============================================\n"
                      "Começando!\n");
@@ -270,6 +275,8 @@ void logEntrada(char *ir, int cycle, char *b_bus, char *c_bus, char *mar, char *
     
     fprintf(log, "==============================================\n");
     fprintf(log, "Ciclo %d\n", cycle);
+
+    fprintf(log, "ir = ");
     for (int i = 0; i < 21; i++) {
         fprintf(log, "%c", ir[i]);
 
@@ -277,10 +284,11 @@ void logEntrada(char *ir, int cycle, char *b_bus, char *c_bus, char *mar, char *
             fprintf(log, " ");
     }
 
-    fprintf(log, "\n");
+    fprintf(log, "\n\n");
     fprintf(log, "b_bus = %s\n", b_bus);
     fprintf(log, "c_bus: ");
     printC_bus(c_bus, log);
+    fprintf(log, "\n");
 
     fprintf(log, "> Registradores antes da instrução\n");
     fprintf(log, "mar = %s\n", mar);

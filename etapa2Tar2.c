@@ -31,6 +31,12 @@ int main() {
     int f1;
     int sll8;       // deslocamento de 8 bits para esquerda
     int sra1;       // deslocamento aritmético em 1 bit pra direita
+    char co;
+
+    char a[33]; 
+    char b[33];
+
+    int ciclo = 1;
 
     char h[]   = "00000000000000000000000000000001";
     char opc[] = "00000000000000000000000000000000";
@@ -44,7 +50,7 @@ int main() {
     char mbr[] = "10000001";
 
     // leitura do arquivo
-    char arquivo[] = "exemplos_projeto/programa_etapa2_tarefa1.txt";
+    char arquivo[] = "exemplos_projeto/programa_etapa2_tarefa2.txt";
     FILE *leitura;
     leitura = fopen(arquivo, "r");
 
@@ -54,30 +60,53 @@ int main() {
     }
 
     // abertura do arquivo de saida do log
-    FILE * log = fopen("saidas-etapa2/tarefa1.txt", "w");
+    FILE * log = fopen("saidas-etapa2/tarefa2.txt", "w");
     if(!log) {
         printf("Erro ao abrir o arquivo de log.\n");
         return 1;
     }
 
-    /*
-    Dentro do loop será feito o seguinte para o log se assemelhar com o da prof.
-
-    processamento de a e b
-    barramento B
-
-    log1 (mostra a instrução, vai printar o b_bus, c_bus e os registradores antes)
-
-    */
-
     while (fgets(IR, sizeof(IR), leitura) != NULL) {
+        char b_bus[5];
+        char c_bus[10];
+        
+        co = '0';
+        sll8 = IR[0] - '0';
+        sra1 = IR[1] - '0';
+        f0 = IR[2] - '0';
+        f1 = IR[3] - '0';
 
-        // strcpy(h, a);
-        if (!erro(pc, IR, log)) {
+        if (erro2(ciclo, IR, log)) 
+            continue;
+        
+        strcpy(a, h);
+        
+        barramentoB(IR, b, b_bus, opc, tos, cpp, lv, sp, pc, mdr, mar, mbr);
 
-            // processamentoEntradas2(IR, a, b);
-            
-            // log, 
-        }
+        processarC_bus(IR, c_bus);
+
+        logEntrada(IR, ciclo, b_bus, c_bus, mar, mdr, pc, mbr, sp, lv, cpp, tos, opc, h, log);
+        
+        processamentoEntradas2(IR, a, b);
+
+        calculoULA(f0, f1, a, b, &co, s);
+
+        if (IR[7] == '1') incremento(s, &co);
+
+        strcpy(sd, s);
+
+        if (sll8) deslocaSLL8(sd);
+        if (sra1) deslocaSRA1(sd);
+
+        barramentoC(IR, sd, c_bus, h, opc, tos, cpp, lv, sp, pc, mdr, mar);
+
+        logFinal(mar, mdr, pc, mbr, sp, lv, cpp, tos, opc, h, log);
+
+        ciclo++;
     }
+
+    printf("log armazenado com sucesso em entrada-e-saida/saida.txt.\n");
+    fclose(leitura);
+    fclose(log);
+    return 0;
 }
