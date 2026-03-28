@@ -14,17 +14,16 @@ void logFinal(char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, cha
 
 int bin2dec(char *x) {
     int decimal = 0;
-    int base = 8;
+    int base = 1;
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = strlen(x) - 1; i >= 0; i--) {
         if (x[i] == '1') {
             decimal += base;
         }
-        base /= 2;
-
+        base *= 2;
     }
 
-    return decimal;
+    return decimal
 }
 
 void barramentoB(char *ir, char *b, char *b_bus, char *opc, char *tos, char *cpp, char *lv, char *sp, char *pc, char *mdr, char *mar, char *mbr) {
@@ -35,8 +34,8 @@ void barramentoB(char *ir, char *b, char *b_bus, char *opc, char *tos, char *cpp
         ctrlB[i] = ir[i+17];
     }
 
-    printf("Seliga -> %d\n\n", bin2dec(ctrlB));
-    printf("Passei\n");
+    ctrlB[4] = '\0';
+
     switch (bin2dec(ctrlB)) {
     case 0:
         strcpy(b, mdr);
