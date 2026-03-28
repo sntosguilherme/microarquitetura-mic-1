@@ -25,7 +25,7 @@ Planejamento da execução do programa
     6- Próxima linha
 */
 
-#include "etapa1.h"
+#include "etapa1Tar1.h"
 
 // Protótipos para visualizar melhor os tipos das funções
 void processamentoEntradas(char * ir, char * a, char * b);
