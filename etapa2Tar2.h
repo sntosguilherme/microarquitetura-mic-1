@@ -16,8 +16,6 @@ int bin2dec(char *x) {
     int decimal = 0;
     int base = 8;
 
-    // printf("String -> %s \nTamanho -> %d\n\n", x, strlen(x));
-
     for (int i = 0; i < 4; i++) {
         if (x[i] == '1') {
             decimal += base;
@@ -68,9 +66,18 @@ void barramentoB(char *ir, char *b, char *b_bus, char *opc, char *tos, char *cpp
     
     // Quando MBRU é selecionado, a palavra deve ser preenchida até 32 bits utilizando zeros.
     case 3: 
-        strcpy(b_bus, "mbru");
-        
-        zerar(b);
+        strcpy(b_bus, "mbr");
+        char x = mbr[0];
+        int j;
+
+        for (int i = 0; i < 32; i++) {
+            if (i < 24)         // de 0 a 23 é preenchido pelo caractere
+                b[i] = x;
+            else {              // de 24 a 32 é preenchido por mbr 
+                b[i] = mbr[j];
+                j++;
+            }
+        }
         
         break;
 
