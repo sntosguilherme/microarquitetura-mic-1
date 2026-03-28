@@ -64,9 +64,6 @@ int main() {
     }
 
     // Converter os 4 ultimos bits de MAR para um número de 0 a 15 correspondente a linha da memória. deve ser posto no loop de execução
-    int obterEndereco(char *mar){
-        // deve retornar o valor inteiro dos 3 últimos bits
-    }
 
     return 0;
 }
