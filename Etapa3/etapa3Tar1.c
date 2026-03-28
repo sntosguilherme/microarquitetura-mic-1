@@ -9,9 +9,12 @@ Memória - 2 bits
 Barramento B - 4 bits
 
 Como estão organizados os 2 bits de memória: 
-IR[21]-> x1: WRITE
-IR[22]-> x2: READ
+IR[21]-> x1: WRITE -> no dados.txt, sobrescreve o endereço indicado por MAR pelo valor em MDR 
+IR[22]-> x2: READ -> sobrescreve o registrador MDR pelo endereço indicado por MAR no dados.txt
+
 Os dois não podem estar em nível lógico alto simultaneamente.
+(ocorrem DEPOIS do processamento da instrução , o endereço indicado por MAR pelo oq eu entendi é o valor em decimal dele q corresponde a linha no arquivo de memória, começando da linha 0)
+
  
 */
 
@@ -30,7 +33,7 @@ int main() {
     char s[33];
     char sd[33];
     char co = '0';
-    char memoria_dados[8][33]; // Memória de 16 linhas de 32 bits.
+    char memoria_dados[8][33]; // Memória de 8 linhas de 32 bits.
 
 
     // Carregando inicialmente a memória. Cada loop pega uma linha inteira do arquivo.
