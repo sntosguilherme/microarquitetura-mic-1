@@ -1,4 +1,4 @@
-#include "etapa1Tar1.h"
+#include "etapa2Tar1.h"
 
 int bin2dec(char *x);  // função auxiliar pra conversão binário para decimal
 void barramentoB(char *ir, char *b, char *b_bus, char *opc, char *tos, char *cpp, char *lv, char *sp, char *pc, char *mdr, char *mar, char *mbr);

@@ -62,7 +62,7 @@ int main(){
     int Z = 0;          // fica 1 quando a saída é apenas 0;
 
     // leitura do arquivo
-    char arquivo[] = "entrada-e-saida-etapa2/programa_etapa2_tarefa1.txt";
+    char arquivo[] = "entrada/programa_etapa2_tarefa1.txt";
     FILE *leitura;
     leitura = fopen(arquivo, "r");
 
@@ -72,7 +72,7 @@ int main(){
     }
 
     // abertura do arquivo de saida do log
-    FILE * log = fopen("entrada-e-saida-etapa2/tarefa1.txt", "w");
+    FILE * log = fopen("saidas/tarefa1.txt", "w");
     if(!log) {
         printf("Erro ao abrir o arquivo de log.\n");
         return 1;
@@ -116,7 +116,7 @@ int main(){
 
     }
 
-    printf("log armazenado com sucesso em entrada-e-saida/saida.txt.\n");
+    printf("log armazenado com sucesso em saidas/tarefa1.txt.\n");
     fclose(leitura);
     fclose(log);
     return 0;

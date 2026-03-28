@@ -51,7 +51,7 @@ int main(){
     int f1;
 
     // abertura do arquivo de entrada
-    char arquivo[] = "entrada-e-saida-etapa1/programa_etapa1.txt";
+    char arquivo[] = "entrada/programa_etapa1.txt";
     FILE *leitura;
     leitura = fopen(arquivo, "r");
     
@@ -61,7 +61,7 @@ int main(){
     }
 
     // abertura do arquivo de saida do log
-    FILE * log = fopen("entrada-e-saida-etapa1/saida.txt", "w");
+    FILE * log = fopen("saidas/saida.txt", "w");
     if(!log) {
         printf("Erro ao abrir o arquivo de log.\n");
         return 1;
@@ -93,7 +93,7 @@ int main(){
         logCiclo(PC, IR, a0, b0, a, b, s, co, log);
     }
 
-    printf("log armazenado com sucesso em entrada-e-saida/saida.txt.\n");
+    printf("log armazenado com sucesso em saidas/saida.txt.\n");
     fclose(leitura);
     fclose(log);
     return 0;

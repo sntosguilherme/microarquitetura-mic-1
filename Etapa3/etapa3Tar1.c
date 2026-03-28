@@ -9,8 +9,8 @@ Memória - 2 bits
 Barramento B - 4 bits
 
 Como estão organizados os 2 bits de memória: 
-IR[21]-> x1: WRITE -> no dados.txt, sobrescreve o endereço indicado por MAR pelo valor em MDR 
-IR[22]-> x2: READ -> sobrescreve o registrador MDR pelo endereço indicado por MAR no dados.txt
+IR[17]-> x1: WRITE -> no dados.txt, sobrescreve o endereço indicado por MAR pelo valor em MDR 
+IR[18]-> x2: READ -> sobrescreve o registrador MDR pelo endereço indicado por MAR no dados.txt
 
 Os dois não podem estar em nível lógico alto simultaneamente.
 (ocorrem DEPOIS do processamento da instrução , o endereço indicado por MAR pelo oq eu entendi é o valor em decimal dele q corresponde a linha no arquivo de memória, começando da linha 0)
@@ -19,7 +19,7 @@ Os dois não podem estar em nível lógico alto simultaneamente.
 */
 
 int main() {
-    int PC = 0;     // contador de programa
+
     char IR[25];    // Agora para 23 bits + \n + \0
     char s[33];     // saida
     char sd[33];    // saida deslocada
@@ -47,7 +47,7 @@ int main() {
     char mbr[] = "00000000";
 
     // Carregando inicialmente a memória. Cada loop pega uma linha inteira do arquivo.
-    FILE *dados = fopen("entrada-e-saida-etapa3/dados_etapa3_tarefa1.txt", "r");
+    FILE *dados = fopen("entrada/dados_etapa3_tarefa1.txt", "r");
     
     if (!dados) {
         printf("Erro ao obter os valores da memoria.\n");
@@ -60,7 +60,7 @@ int main() {
     
 
     // Abrindo arquivo para leitura
-    char arquivo[] = "entrada-e-saida-etapa3/microinstrucoes_etapa3_tarefa1.txt";
+    char arquivo[] = "entrada/microinstrucoes_etapa3_tarefa1.txt";
     FILE *leitura;
     leitura = fopen(arquivo, "r");
 
@@ -70,7 +70,7 @@ int main() {
     }
 
     // abertura do arquivo de saida do log
-    FILE * log = fopen("entrada-e-saida-etapa3/tarefa1.txt", "w");
+    FILE * log = fopen("saidas/tarefa1.txt", "w");
     if(!log) {
         printf("Erro ao abrir o arquivo de log.\n");
         return 1;
@@ -119,7 +119,7 @@ int main() {
         ciclo++;
     }
 
-    printf("log armazenado com sucesso em entrada-e-saida/saida.txt.\n");
+    printf("log armazenado com sucesso em saidas/tarefa1.txt.\n");
     fclose(leitura);
     fclose(log);
 
