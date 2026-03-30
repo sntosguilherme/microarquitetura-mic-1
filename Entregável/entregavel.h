@@ -13,7 +13,7 @@ void DUP(char *mar, char *sp, char *mdr, char *tos, char memoria[8][33]);
 void BIPUSH(char *h, char* byte, char *sp, char *mar, char *mdr, char* mbr, char *tos, char memoria[8][33]);
 void logEntradaEntregavel(char memoria[8][33], char *nome, int cycle, char *b_bus, char *c_bus, int indice, char *val_bin, char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log);
 void logFinalEntregavel(char memoria[8][33], char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log);
-int defInstrucao(char * nome, int indice, char * val_bin);
+int defInstrucao(char * nome, int indice, char * val_bin); // função que retorna um inteiro para representar cada instrução implementada.
 
 
 
@@ -117,8 +117,10 @@ void logEntradaEntregavel(char memoria[8][33], char *nome, int cycle, char *b_bu
             
             fprintf(log, "==============================================\n"
                 "Começando!\n");
-        }
-        
+            }
+    fprintf(log, "==============================================\n");
+    fprintf(log, "Ciclo %d\n", cycle);
+    
     int instrucao = defInstrucao(nome, indice, val_bin);
     switch (instrucao)
     {
@@ -134,8 +136,11 @@ void logEntradaEntregavel(char memoria[8][33], char *nome, int cycle, char *b_bu
     default:
         break;
     }
-    fprintf(log, "==============================================\n");
-    fprintf(log, "Ciclo %d\n", cycle);
+        fprintf(log, "\n");
+    fprintf(log, "b_bus = %s\n", b_bus);
+    fprintf(log, "c_bus: %s\n", c_bus);
+    fprintf(log, "\n");
+    
     fprintf(log, "> Registradores antes da instrução\n");
     fprintf(log, "mar = %s\n", mar);
     fprintf(log, "mdr = %s\n", mdr);
@@ -163,7 +168,7 @@ void logFinalEntregavel(char memoria[8][33], char *mar, char *mdr, char *pc, cha
     fprintf(log, "> Memoria depois da instrucao\n");
     logMemoria(memoria, log);
 }   
-int defInstrucao(char * nome, int indice, char * val_bin){
+int defInstrucao(char * nome, int indice, char * val_bin){  
     if(strcmp(nome, "ILOAD") == 0){
         return 1;
     }

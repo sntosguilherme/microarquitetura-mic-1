@@ -81,13 +81,11 @@ int main() {
             else if (strcmp(instrucao, "BIPUSH") == 0) { // BIPUSH
                 char valor_binario[9]; // 8 bits + '\0'
                 // atribuindo as strings corretas para os barramentos B e C de acordo com BIPUSH
-                strcpy(b_bus,"tos");
+                strcpy(b_bus,"mbr");
                 strcpy(c_bus,"mdr,sp,mar");
-
                 fscanf(leitura, "%s", valor_binario);  // captura o valor de 8 bits da instrução BIPUSH
                 logEntradaEntregavel(memoria_dados,instrucao,ciclo,b_bus,c_bus,-1,valor_binario,mar,mdr,pc,mbr,sp,lv,cpp,tos,opc,h,log);
                 BIPUSH(h, valor_binario, sp, mar, mdr, mbr, tos, memoria_dados);
-                printf("a\n");
                 logFinalEntregavel(memoria_dados, mar, mdr, pc, mbr, sp, lv, cpp, tos, opc, h, log);
             }
     
