@@ -1,106 +1,110 @@
-// assumindo que etapa 3 tenha um include.h
 #include "../Etapa3/etapa3.h"
 
-/*
-    Essas funções executam os trechos explicitados na parte de entregável
-    São apenas as bases para o real funcionamento
-    Ainda falta implementar como o rd e write afeta o programa!!!!!!
-*/
-
-
-void ILOAD(char *h, int x, char *lv, char *mar, char *sp, char *tos, char *mdr, char memoria[8][33]);
-void DUP(char *mar, char *sp, char *mdr, char *tos, char memoria[8][33]);
-void BIPUSH(char *h, char* byte, char *sp, char *mar, char *mdr, char* mbr, char *tos, char memoria[8][33]);
-void logEntradaEntregavel(char memoria[8][33], char *nome, int cycle, char *b_bus, char *c_bus, int indice, char *val_bin, char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log);
-void logFinalEntregavel(char memoria[8][33], char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log);
+void ILOAD(char *h, int x, char *lv, char *mar, char *sp, char *tos, char *mdr, char memoria[][33]);
+void DUP(char *mar, char *sp, char *mdr, char *tos, char memoria[][33]);
+void BIPUSH(char *h, char* byte, char *sp, char *mar, char *mdr, char* mbr, char *tos, char memoria[][33]);
+void logEntradaEntregavel(char memoria[][33], char *nome, int cycle, char *b_bus, char *c_bus, int indice, char *val_bin, char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log);
+void logFinalEntregavel(char memoria[][33], char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log);
 int defInstrucao(char * nome, int indice, char * val_bin);
+int getMemAddr(char *mar);
+void logMemoriaEntregavel(char memoria[][33], FILE *log);
 
 
+// Extrai os 4 últimos bits de MAR para usar como endereço de memória (0-15)
+int getMemAddr(char *mar) {
+    char mar_bits[5];
+    for (int i = 0; i < 4; i++) {
+        mar_bits[i] = mar[i + 28];
+    }
+    mar_bits[4] = '\0';
+    return bin2dec(mar_bits);
+}
 
-void ILOAD(char *h, int x, char *lv, char *mar, char *sp, char *tos, char *mdr, char memoria[8][33]) {
+// Imprime as 16 linhas da memória de dados no log
+void logMemoriaEntregavel(char memoria[][33], FILE *log) {
+    fprintf(log, "*******************************\n");
+    for (int i = 0; i < 16; i++) {
+        fprintf(log, "%s\n", memoria[i]);
+    }
+    fprintf(log, "*******************************\n");
+}
+
+void ILOAD(char *h, int x, char *lv, char *mar, char *sp, char *tos, char *mdr, char memoria[][33]) {
 
     // H = LV
     strcpy(h, lv);
 
+    // H = H+1 (x vezes)
     char fakeCo = '0';
     for (int i = 0; i < x; i++) {
+        fakeCo = '0';
         incremento(h, &fakeCo);
     }
 
-    // mar = h; rd
-    strcpy(mar,h);
+    // MAR = H; rd
+    strcpy(mar, h);
 
-    // rd
-    strcpy(mdr, memoria[bin2dec(mar)]);
+    // rd: MDR = memoria[endereço de MAR]
+    strcpy(mdr, memoria[getMemAddr(mar)]);
 
-    // sp = sp + 1
+    // SP = SP + 1
     fakeCo = '0';
     incremento(sp, &fakeCo);
     
-    // mar = sp = sp + 1; wr
+    // MAR = SP; wr
     strcpy(mar, sp);
 
-    // wr 
-    strcpy(memoria[bin2dec(mar)], mdr);
+    // wr: memoria[endereço de MAR] = MDR
+    strcpy(memoria[getMemAddr(mar)], mdr);
     
-    // tos = mdr
+    // TOS = MDR
     strcpy(tos, mdr);
 }
 
-void DUP(char *mar, char *sp, char *mdr, char *tos, char memoria[8][33]) {
-    // sp = sp + 1
+void DUP(char *mar, char *sp, char *mdr, char *tos, char memoria[][33]) {
+    // SP = SP + 1
     char fakeCo = '0';
     incremento(sp, &fakeCo);
 
-    // mar = sp = sp + 1
+    // MAR = SP
     strcpy(mar, sp);
 
-    // mdr = tos; wr
+    // MDR = TOS; wr
     strcpy(mdr, tos);
 
-    // wr 
-    strcpy(memoria[bin2dec(mar)], mdr);
+    // wr: memoria[endereço de MAR] = MDR
+    strcpy(memoria[getMemAddr(mar)], mdr);
 }
 
-void BIPUSH(char *h, char* byte, char *sp, char *mar, char *mdr, char* mbr, char *tos, char memoria[8][33]) {
-    // sp = sp + 1
+void BIPUSH(char *h, char* byte, char *sp, char *mar, char *mdr, char* mbr, char *tos, char memoria[][33]) {
+    // SP = MAR = SP + 1
     char fakeCo = '0';
     incremento(sp, &fakeCo);
-
-
-    // mar = sp + 1
     strcpy(mar, sp);
 
-    // sp = mar = sp + 1
-    strcpy(sp, mar);
-
-    strcpy(mbr,byte);
-    // fetch, insere diretamente em H os 8 bits recebidos e preenche ele com 0
-    for (int i = 0, j = 0; i < 32; i++) {
-        if (i < 24) {
-            h[i] = '0';
-        }
-        else {
-            h[i] = byte[j];
-            j++;
-        }
+    // fetch: MBR = byte, H = MBR (com zeros à esquerda, sem passar pela ULA)
+    strcpy(mbr, byte);
+    for (int i = 0; i < 24; i++) {
+        h[i] = '0';
+    }
+    for (int i = 0; i < 8; i++) {
+        h[24 + i] = byte[i];
     }
     h[32] = '\0';
 
-    // tos = h
+    // MDR = TOS = H; wr
     strcpy(tos, h);
-
-    // mdr = tos = h; wr
     strcpy(mdr, tos);
 
-    // wr 
-    strcpy(memoria[bin2dec(mar)], mdr);
+    // wr: memoria[endereço de MAR] = MDR
+    strcpy(memoria[getMemAddr(mar)], mdr);
 }
-void logEntradaEntregavel(char memoria[8][33], char *nome, int cycle, char *b_bus, char *c_bus, int indice, char *val_bin, char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log){
-    if (cycle == 1) {   // colocando como string caso ela bote registradores diferentes
+
+void logEntradaEntregavel(char memoria[][33], char *nome, int cycle, char *b_bus, char *c_bus, int indice, char *val_bin, char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log){
+    if (cycle == 1) {
         fprintf(log, "==============================================\n");
         fprintf(log, "> Estado da memoria inicial\n");
-        logMemoria(memoria, log);
+        logMemoriaEntregavel(memoria, log);
         
         fprintf(log, "==============================================\n");
         fprintf(log, "> Estado dos registradores iniciais\n");
@@ -116,7 +120,7 @@ void logEntradaEntregavel(char memoria[8][33], char *nome, int cycle, char *b_bu
             "h = %s\n\n", mar, mdr, pc, mbr, sp, lv, cpp, tos, opc, h);
             
             fprintf(log, "==============================================\n"
-                "Começando!\n");
+                "Comecando!\n");
         }
         
     int instrucao = defInstrucao(nome, indice, val_bin);
@@ -136,7 +140,9 @@ void logEntradaEntregavel(char memoria[8][33], char *nome, int cycle, char *b_bu
     }
     fprintf(log, "==============================================\n");
     fprintf(log, "Ciclo %d\n", cycle);
-    fprintf(log, "> Registradores antes da instrução\n");
+    fprintf(log, "b_bus = %s\n", b_bus);
+    fprintf(log, "c_bus = %s\n\n", c_bus);
+    fprintf(log, "> Registradores antes da instrucao\n");
     fprintf(log, "mar = %s\n", mar);
     fprintf(log, "mdr = %s\n", mdr);
     fprintf(log, "pc = %s\n", pc);
@@ -148,8 +154,8 @@ void logEntradaEntregavel(char memoria[8][33], char *nome, int cycle, char *b_bu
     fprintf(log, "opc = %s\n", opc);
     fprintf(log, "h = %s\n\n", h);
 }
-void logFinalEntregavel(char memoria[8][33], char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log){
-    fprintf(log, "> Registradores depois da instrução\n");
+void logFinalEntregavel(char memoria[][33], char *mar, char *mdr, char *pc, char *mbr, char *sp, char *lv, char *cpp, char *tos, char *opc, char *h, FILE* log){
+    fprintf(log, "> Registradores depois da instrucao\n");
     fprintf(log, "mar = %s\n", mar);
     fprintf(log, "mdr = %s\n", mdr);
     fprintf(log, "pc = %s\n", pc);
@@ -161,7 +167,7 @@ void logFinalEntregavel(char memoria[8][33], char *mar, char *mdr, char *pc, cha
     fprintf(log, "opc = %s\n", opc);
     fprintf(log, "h = %s\n\n", h);
     fprintf(log, "> Memoria depois da instrucao\n");
-    logMemoria(memoria, log);
+    logMemoriaEntregavel(memoria, log);
 }   
 int defInstrucao(char * nome, int indice, char * val_bin){
     if(strcmp(nome, "ILOAD") == 0){
